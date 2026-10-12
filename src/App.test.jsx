@@ -1,8 +1,15 @@
-import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, fireEvent, cleanup } from '@testing-library/react'
-import App, { LOVE_MESSAGE } from './App.jsx'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
+import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
+import App, { LOVE_MESSAGE, SPIN_DURATION_MS } from './App.jsx'
 
-afterEach(cleanup)
+beforeEach(() => {
+  vi.useFakeTimers()
+})
+
+afterEach(() => {
+  cleanup()
+  vi.useRealTimers()
+})
 
 describe('App', () => {
   it('toont het hartje zonder boodschap', () => {
@@ -25,5 +32,38 @@ describe('App', () => {
     fireEvent.click(heart)
     fireEvent.click(heart)
     expect(heart.className).toContain('heart--spin')
+  })
+
+  it('reset de spin-state na de animatieduur, zodat het hartje opnieuw draait', () => {
+    render(<App />)
+    const heart = screen.getByTestId('heart')
+    fireEvent.click(heart)
+    act(() => {
+      vi.advanceTimersByTime(SPIN_DURATION_MS)
+    })
+    expect(heart.className).not.toContain('heart--spin')
+    fireEvent.click(heart)
+    expect(heart.className).toContain('heart--spin')
+  })
+
+  it('blokkeert het hartje niet als de animatie niet draait (reduced motion)', () => {
+    // Bij reduced motion is de class-gebaseerde animatie uitgeschakeld; de state
+    // moet ook dan na de timer terugkeren zodat het hartje niet vast blijft zitten.
+    render(<App />)
+    const heart = screen.getByTestId('heart')
+    fireEvent.click(heart)
+    act(() => {
+      vi.advanceTimersByTime(SPIN_DURATION_MS)
+    })
+    fireEvent.click(heart)
+    expect(heart.className).toContain('heart--spin')
+    expect(screen.getByTestId('message').textContent).toBe(LOVE_MESSAGE)
+  })
+
+  it('kondigt de boodschap aan voor schermlezers', () => {
+    render(<App />)
+    const message = screen.getByTestId('message')
+    expect(message.getAttribute('role')).toBe('status')
+    expect(message.getAttribute('aria-live')).toBe('polite')
   })
 })
