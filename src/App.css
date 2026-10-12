@@ -1,0 +1,77 @@
+:root {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffe4ec, #ffd1dc);
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.heart {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 180px;
+  height: 180px;
+  transform-style: preserve-3d;
+}
+
+.heart:focus-visible {
+  outline: 3px solid #e0245e;
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
+.heart svg {
+  width: 100%;
+  height: 100%;
+  fill: #e0245e;
+  filter: drop-shadow(0 8px 16px rgba(224, 36, 94, 0.35));
+}
+
+.heart--spin {
+  animation: heart-spin 1s ease-in-out;
+}
+
+@keyframes heart-spin {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.message {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #b0124a;
+  min-height: 2.5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.message--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart--spin {
+    animation: none;
+  }
+}
